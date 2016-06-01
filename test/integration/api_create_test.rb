@@ -1,4 +1,5 @@
 require 'test_helper'
+require "google_drive"
 
 class ApiCreateTest < ActionDispatch::IntegrationTest
   def setup

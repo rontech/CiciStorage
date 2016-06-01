@@ -1,16 +1,10 @@
 Rails.application.routes.draw do
-  get 'pictures/create'
-
-  get 'pictures/create'
-
-  get 'password_resets/new'
-
-  get 'password_resets/edit'
-
   root      'static_pages#home'
   get 'help' => 'static_pages#help'
   get 'about' => 'static_pages#about'
   get 'contact' => 'static_pages#contact'
+  get 'connect' => 'static_pages#connect_storage'
+  get 'callback' => 'static_pages#callback'
   get 'signup' => 'users#new'
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'
