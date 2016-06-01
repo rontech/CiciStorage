@@ -11,7 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160530081137) do
+ActiveRecord::Schema.define(version: 20160601091200) do
+
+  create_table "pictures", force: :cascade do |t|
+    t.string   "name"
+    t.string   "type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "users", force: :cascade do |t|
     t.string   "name"
@@ -26,6 +33,7 @@ ActiveRecord::Schema.define(version: 20160530081137) do
     t.datetime "activated_at"
     t.string   "reset_digest"
     t.datetime "reset_sent_at"
+    t.string   "api_token"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

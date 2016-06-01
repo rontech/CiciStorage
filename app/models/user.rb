@@ -59,6 +59,11 @@ class User < ActiveRecord::Base
     reset_sent_at < 2.hours.ago
   end
 
+  def update_api_token(token)
+    digest_token = User.digest(token)
+    update_attribute(:api_token, digest_token)
+  end
+
   private
     def downcase_email
       self.email = email.downcase
