@@ -1,9 +1,9 @@
 {
-  "client_id": "dummy.apps.googleusercontent.com",
-  "client_secret": "dummy_01234567890",
+  "client_id": "580328114454-f46klv59j6apof1c3irnig30m6phom46.apps.googleusercontent.com",
+  "client_secret": "OwnwEBtOLoRBwPzFjqcM-gcn",
   "scope": [
     "https://www.googleapis.com/auth/drive",
     "https://spreadsheets.google.com/feeds/"
   ],
-  "refresh_token": "dummy_01245678901234567890123456789012345678901234567890123456789"
+  "refresh_token": "1/vfkD_KBCY3xNS4s6kgK42ES6WM8m9xZAG5KLIw2_DG8MEudVrK5jSpoR30zcRFq6"
 }
