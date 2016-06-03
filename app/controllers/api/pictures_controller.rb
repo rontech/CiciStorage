@@ -1,4 +1,6 @@
 class Api::PicturesController < ApplicationController
+  before_action :connect, only: [:create, :show]
+
   def login
     request_json = JSON.parse(request.body.read)
     if request_json.blank?
@@ -31,38 +33,38 @@ class Api::PicturesController < ApplicationController
   end
 
   def create
-    json = request_json
-    if json.nil?
+    json = JSON.parse(request.body.read)
+    user = request_user(json)
+    if user.nil?
       render :json => {error: "No file uploaded."}
     else
-      # decode the base64
-      data = StringIO.new(Base64.decode64(json["data"]))
-
-      # assign some attributes for carrierwave processing
-      data.class.class_eval { attr_accessor :original_filename, :content_type }
-      data.original_filename = json["original_filename"]
-      data.content_type = json["content_type"]
-      picture = Picture.new(name: json["original_filename"], type: json["content_type"])
+      content_type = json["type"]
+      picture = Picture.new(name: json["name"], content_type: content_type,
+                            user: user.id, key: Picture.gen_key)
       if picture.save
-        render :json => {url: picture.id}
+        upload_file user.id, picture.key, json["data"], content_type 
+        access_path = request.base_url + (api_picture_path id: picture.key)
+        render :json => {url: "#{access_path}"}
       else
-      render :json => {error: "Failed to save."}
+        render :json => {error: "Failed to save."}
       end
     end
   end
 
-  private
-    def request_json
-      json = JSON.parse(request.body.read)
-      token = json["token"]
-      user = User.find_by(api_token: token)
-      user.nil?? nil : json
+  def show
+    key = params[:id]
+    picture = Picture.find_by(key: key)
+    if picture.nil?
+      render :json => {error: "File not found."}
+    else
+      sio = StringIO.new
+      download_file(picture.user, picture.key, picture.content_type, sio)
+      send_data sio.string, :filename => picture.name, :type => picture.content_type
     end
+  end
 
-    def request_user
-      json = JSON.parse(request.body.read)
-      token = json["token"]
-      user = User.find_by(api_token: token)
-      user.nil?? nil : user
+  private
+    def connect
+      connect_to_storage
     end
 end

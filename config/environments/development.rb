@@ -42,4 +42,7 @@ Rails.application.configure do
 
   host = '10.4.102.115:3000'
   config.action_mailer.default_url_options = { host: host }
+
+  #storage folder
+  config.storage_folder = 'cici_storage_test'
 end
