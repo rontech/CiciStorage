@@ -1,4 +1,13 @@
 ENV['RAILS_ENV'] ||= 'test'
+if ENV['CI']
+  require 'simplecov'
+  require 'coveralls'
+  Coveralls.wear!('rails')
+
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[Coveralls::SimpleCov::Formatter]
+  SimpleCov.start 'test_frameworks'
+end
+
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require "minitest/reporters"
@@ -26,13 +35,6 @@ class ActiveSupport::TestCase
     end
   end
 
-  if ENV['CI']
-    require 'coveralls'
-    Coveralls.wear!
-
-    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[Coveralls::SimpleCov::Formatter]
-    SimpleCov.start 'test_frameworks'
-  end
   private
 
     def integration_test?

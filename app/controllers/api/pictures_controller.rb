@@ -39,11 +39,11 @@ class Api::PicturesController < ApplicationController
       render :json => {error: "No file uploaded."}
     else
       content_type = json["type"]
-      picture = Picture.new(name: json["name"], content_type: content_type,
-                            user: user.id, key: Picture.gen_key)
+      picture = Picture.new(file_name: json["name"], content_type: content_type,
+                            user_id: user.id, url_key: Picture.gen_key)
       if picture.save
-        upload_file user.id, picture.key, json["data"], content_type 
-        access_path = request.base_url + (api_picture_path id: picture.key)
+        upload_file user.id, picture.url_key, json["data"], content_type 
+        access_path = request.base_url + (api_picture_path id: picture.url_key)
         render :json => {url: "#{access_path}"}
       else
         render :json => {error: "Failed to save."}
@@ -53,13 +53,13 @@ class Api::PicturesController < ApplicationController
 
   def show
     key = params[:id]
-    picture = Picture.find_by(key: key)
+    picture = Picture.find_by(url_key: key)
     if picture.nil?
       render :json => {error: "File not found."}
     else
       sio = StringIO.new
-      download_file(picture.user, picture.key, picture.content_type, sio)
-      send_data sio.string, :filename => picture.name, :type => picture.content_type
+      download_file(picture.user_id, picture.url_key, picture.content_type, sio)
+      send_data sio.string, :filename => picture.file_name, :type => picture.content_type
     end
   end
 
