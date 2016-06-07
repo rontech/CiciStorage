@@ -1,4 +1,6 @@
 class Api::PicturesController < ApplicationController
+  protect_from_forgery with: :null_session
+
   before_action :connect, only: [:create, :show]
 
   def login
