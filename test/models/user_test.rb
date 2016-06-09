@@ -62,4 +62,13 @@ class UserTest < ActiveSupport::TestCase
   test "authenticated? should return false for a user with nil digest" do
     assert_not @user.authenticated?(:remember, '')
   end
+
+  test "associated pictures should be destroyed" do
+    @user.save
+    @user.pictures.create!(file_name: "test.jpg", content_type: "image/jpg",
+                                url_key: Picture.gen_key)
+    assert_difference 'Picture.count', -1 do
+      @user.destroy
+    end
+  end
 end

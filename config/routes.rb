@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resources :users
   resources :account_activations, only: [:edit]
   resources :password_resets, only: [:new, :create, :edit, :update]
+  resources :pictures, only: [:create, :destroy]
 
   namespace :api, defaults:{format: 'json'} do
       post 'login' => 'pictures#login'

@@ -7,19 +7,26 @@ module Api::PicturesHelper
     @drive_session.collection_by_title(CiciStorage::Application::config.storage_folder)
   end
 
-  def upload_file(user, name, contents, content_type)
+  def upload_file(user, name, io, content_type)
     folder = user_folder(user)
-    file = @drive_session.upload_from_io(
-        StringIO.new(Base64.decode64(contents)), name, :content_type => content_type)
+    file = @drive_session.upload_from_io(io, name, convert: false, :content_type => content_type)
     folder.add(file)
     @drive_session.root_collection.remove(file)
   end
 
-  def download_file(user, name, content_type, io)
+  def download_file(user, name, io)
     folder = root_folder.subcollection_by_title(user.to_s)
     file = folder.file_by_title(name)
     if !file.nil?
-      file.download_to_io(io, :content_type => content_type)
+      file.download_to_io(io)
+    end
+  end
+
+  def remove_file(user, name)
+    folder = root_folder.subcollection_by_title(user.to_s)
+    file = folder.file_by_title(name)
+    if !file.nil?
+      folder.remove(file)
     end
   end
 

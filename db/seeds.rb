@@ -24,3 +24,9 @@ User.create!(name:  "Lambert Zhang",
                activated: true,
                activated_at: Time.zone.now)
 end
+
+users = User.order(:created_at).take(6)
+50.times do
+  file_name = Faker::Lorem.sentence(1)
+  users.each { |user| user.pictures.create!(file_name: file_name, content_type: "image/jpg", url_key: Picture.gen_key) }
+end

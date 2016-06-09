@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  has_many :pictures, dependent: :destroy
   attr_accessor :remember_token, :activation_token, :reset_token
   before_save :downcase_email
   before_create :create_activation_digest
@@ -62,6 +63,10 @@ class User < ActiveRecord::Base
   def update_api_token(token)
     digest_token = User.digest(token)
     update_attribute(:api_token, digest_token)
+  end
+
+  def feed
+    Picture.where("user_id = ?", id)
   end
 
   private

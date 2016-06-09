@@ -2,7 +2,7 @@
 
 ## About 
 
-CiciStorage provides storage through REST interface.You can contruct your own online web
+CiciStorage provides picture storage through REST interface.You can contruct your own online web
 sotrage service instead of Amazon S3 and other charged storage services.
 
 ## Background storage
@@ -10,7 +10,7 @@ sotrage service instead of Amazon S3 and other charged storage services.
 We support google drive now, and will support the background storages below in the coming days:
 - MongoDB
 - Redis
-- RDBMS
+- Dropbox
 
 ## Deploy to heroku
 
@@ -40,7 +40,7 @@ then commit the change to the local git repository.
 
 5.Push to heroku 
 
-    $ git push herou master
+    $ git push heroku master
 
 6.Migrate your database
 

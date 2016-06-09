@@ -27,6 +27,13 @@ class ApiCreateTest < ActionDispatch::IntegrationTest
     get api_picture_path(id: URI(url).path.split('/').last)
     assert_response :success
     assert_equal "image/jpeg", @response.content_type
+    assert_equal  Base64.encode64(@response.body), encoded_data
+
+    delete api_picture_path(id: URI(url).path.split('/').last), {token: token}.to_json
+    assert_response :success
+    response_json = JSON.parse(@response.body)
+    id = response_json["id"]
+    assert_not_nil id
     
     post api_logout_path, {token: token}.to_json
     assert_response :success

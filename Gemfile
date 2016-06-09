@@ -15,6 +15,9 @@ gem 'will_paginate',           '3.0.7'
 gem 'bootstrap-will_paginate', '0.0.10'
 gem 'puma',        '2.11.1'
 gem 'google_drive'
+gem 'carrierwave',  '0.10.0'
+gem 'mini_magick',  '3.8.0'
+gem 'fog',          '1.36.0'
 
 group :development, :test do
   gem 'sqlite3',     '1.3.9'

@@ -1,0 +1,16 @@
+<li id="picture-<%= picture.id %>">
+  <%= link_to gravatar_for(picture.user, size: 50), picture.user %>
+  <span class="user"><%= link_to picture.user.name, picture.user %></span>
+  <span class="file_name">
+    <%= picture.file_name %>
+    <%= picture.content_type %>
+    <%= image_tag (api_picture_path id: picture.url_key) if picture.file_name? %>
+  </span>
+  <span class="timestamp">
+    Posted <%= time_ago_in_words(picture.created_at) %> ago.
+    <% if current_user?(picture.user) %>
+      <%= link_to "delete", picture, method: :delete,
+                                       data: { confirm: "You sure?" } %>
+    <% end %>
+  </span>
+</li>
