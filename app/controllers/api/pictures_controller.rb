@@ -44,7 +44,9 @@ class Api::PicturesController < ApplicationController
       picture = user.pictures.create(file_name: json["name"], 
                                       content_type: content_type)
       if picture.save
-        upload_file user.id, picture.url_key, StringIO.new(Base64.decode64(json["data"])), content_type 
+        file_id = upload_file(user, picture.url_key, StringIO.new(Base64.decode64(json["data"])), content_type)
+        picture.gd_id = file_id
+        picture.save
         access_path = request.base_url + (api_picture_path id: picture.url_key)
         render :json => {url: "#{access_path}"}
       else
@@ -60,8 +62,7 @@ class Api::PicturesController < ApplicationController
       render :json => {error: "File not found."}
     else
       sio = StringIO.new
-      sio.binmode
-      download_file(picture.user_id, picture.url_key, sio)
+      download_file(picture.gd_id, sio)
       sio.rewind
       send_data sio.read, :filename => picture.file_name, :type => picture.content_type
     end
@@ -75,7 +76,7 @@ class Api::PicturesController < ApplicationController
     else
       key = params[:id]
       picture = Picture.find_by(url_key: key)
-      remove_file(picture.user_id, picture.url_key)
+      remove_file(user, picture.gd_id)
       render :json => {id: "#{key}"}
     end
   end

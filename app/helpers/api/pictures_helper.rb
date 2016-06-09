@@ -1,33 +1,33 @@
 module Api::PicturesHelper
   def connect_to_storage 
     @drive_session ||= GoogleDrive.saved_session(config_path)
-  end
-
-  def root_folder
-    @drive_session.collection_by_title(CiciStorage::Application::config.storage_folder)
+    @drive ||= @drive_session.drive
+    @root_id ||= get_root
   end
 
   def upload_file(user, name, io, content_type)
-    folder = user_folder(user)
-    file = @drive_session.upload_from_io(io, name, convert: false, :content_type => content_type)
-    folder.add(file)
-    @drive_session.root_collection.remove(file)
+    create_user_folder(user) if user.gd_fid.nil?
+    metadata = {
+      name: name,
+      title: name,
+      convert: false,
+      parents: [user.gd_fid]
+     
+    }
+    file = @drive.create_file(
+            metadata,
+            fields: 'id',
+            upload_source: io,
+            content_type: 'image/jpeg')    
+    file.id
   end
 
-  def download_file(user, name, io)
-    folder = root_folder.subcollection_by_title(user.to_s)
-    file = folder.file_by_title(name)
-    if !file.nil?
-      file.download_to_io(io)
-    end
+  def download_file(file_id, io)
+    @drive.get_file(file_id, download_dest: io)
   end
 
-  def remove_file(user, name)
-    folder = root_folder.subcollection_by_title(user.to_s)
-    file = folder.file_by_title(name)
-    if !file.nil?
-      folder.remove(file)
-    end
+  def remove_file(user, file_id)
+    @drive.update_file(file_id, remove_parents: user.gd_fid, fields: '')
   end
 
   def request_user(json = nil)
@@ -44,11 +44,29 @@ module Api::PicturesHelper
       File.join(Rails.root, "config", "google_drive.json").to_s
     end
 
-    def user_folder(user)
-      folder = root_folder.subcollection_by_title(user.to_s)
-      if folder.nil?
-        folder = root_folder.create_subcollection(user.to_s)
+    def create_user_folder(user)
+      if user.gd_fid.nil?
+        metadata = {
+          name: user.id.to_s,
+          parents:[@root_id],
+          mime_type: 'application/vnd.google-apps.folder'
+        }
+        file = @drive.create_file(metadata, fields: 'id') 
+        user.gd_fid = file.id
+        user.save
       end
-      folder
+    end
+
+    def get_root
+      name = CiciStorage::Application::config.storage_folder
+      id = nil
+      response = @drive.list_files(q: "mimeType='application/vnd.google-apps.folder' and name = '#{name}'",
+                                   spaces: 'drive',
+                                   fields:'files(id)',
+                                   page_token: nil)
+      for file in response.files
+        id = file.id
+      end
+      id
     end
 end

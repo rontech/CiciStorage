@@ -9,7 +9,9 @@ class PicturesController < ApplicationController
     @picture.set_attributes
     if @picture.save
       File.open(@picture.temp_file.file.file) do |io|
-        upload_file user.id, @picture.url_key, io, @picture.content_type
+        file_id = upload_file(user, @picture.url_key, io, @picture.content_type)
+        @picture.gd_id = file_id
+        @picture.save
       end
       File.unlink @picture.temp_file.file.file
       flash[:success] = "Picture created!"
@@ -21,7 +23,7 @@ class PicturesController < ApplicationController
   end
 
   def destroy
-    remove_file @picture.user_id, @picture.url_key
+    remove_file current_user,  @picture.gd_id
     @picture.destroy
     flash[:success] = "Picture deleted"
     redirect_to request.referrer || root_url
